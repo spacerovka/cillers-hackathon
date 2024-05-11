@@ -36,6 +36,12 @@ export const GET_CONTRACTS = gql`
   }
 `;
 
+export const GET_FORM = gql`
+  query GetForm($id: String!) {
+    form(id: $id) { id, text, showEmail, showFirstName, showLastName }
+  }
+`;
+
 export const REMOVE_PRODUCT = gql`
   mutation RemoveProduct($id: String!) {
     removeProduct(id: $id)

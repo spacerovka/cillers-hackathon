@@ -20,6 +20,14 @@ class Contract:
     checkSum: Optional[str] = None
     signageDate: Optional[str] = None
 
+@strawberry.type
+class ContractForm:
+    id: str
+    text: str
+    showEmail: bool    
+    showFirstName: bool
+    showLastName: bool
+
 def create_product(name: str) -> Product:
     id = str(uuid.uuid1())
     cb.insert(env.get_couchbase_conf(),
@@ -61,6 +69,14 @@ def get_product(id: str) -> Product | None:
                                collection='products',
                                key=id)):
         return Product(id=id, name=doc['name'])
+    
+
+def get_form(id: str) -> ContractForm | None:
+    if doc := cb.get(env.get_couchbase_conf(),
+                     cb.DocRef(bucket=env.get_couchbase_bucket(),
+                               collection='contract_form',
+                               key=id)).content_as[dict]:
+        return ContractForm(id=id, text=doc['text'], showEmail=doc['showEmail'], showFirstName=doc['showFirstName'], showLastName=doc['showLastName'])
 
 def delete_product(id: str) -> None:
     cb.remove(env.get_couchbase_conf(),

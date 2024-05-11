@@ -217,9 +217,18 @@ modules:
       script: |
         CREATE COLLECTION cillers._default.products IF NOT EXISTS;
         CREATE COLLECTION cillers._default.contracts IF NOT EXISTS;
+        CREATE COLLECTION cillers._default.contract_form IF NOT EXISTS;
         CREATE PRIMARY INDEX IF NOT EXISTS ON cillers;
         CREATE PRIMARY INDEX IF NOT EXISTS ON cillers._default.products;
         CREATE PRIMARY INDEX IF NOT EXISTS ON cillers._default.contracts;
+        CREATE PRIMARY INDEX IF NOT EXISTS ON cillers._default.contract_form;
+        UPSERT INTO cillers._default.contract_form (KEY,VALUE)
+          VALUES ( "1",
+          { "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a maximus est. Phasellus blandit blandit rhoncus. Nulla ac suscipit orci. Nunc quis sodales eros. Curabitur venenatis eget lorem ut scelerisque. Vestibulum vitae tincidunt ante. Aenean vel ipsum libero. Maecenas pulvinar purus nunc, in congue mauris tempor sed. Cras at sem non arcu volutpat semper. Duis rutrum eget sem ac scelerisque. Sed a ante magna.",
+            "showEmail": true,
+            "showFirstName": true,
+            "showLastName": true
+          } );
       retries: 20
 
   - id: redpanda

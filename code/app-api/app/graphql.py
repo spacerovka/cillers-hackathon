@@ -77,6 +77,10 @@ class Query:
     @strawberry.field(permission_classes=[IsAuthenticated])
     def hello(self) -> Message:
         return Message(message="Hej, hej")
+    
+    @strawberry.field
+    def form(self, id:str) -> db.ContractForm:
+        return db.get_form(id)
 
 #### Subscriptions ####
 

@@ -5,6 +5,7 @@ import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import Contract from './pages/Contract';
 import ContractDetails from './pages/ContractDetails';
 import SignedContract from './pages/SignedContract';
+import ContractAdmin from './pages/ContractAdmin';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
         <Route path="/contract" element={<Contract />} />
         <Route path="/contract-details" element={<ContractDetails />} />
         <Route path="/signed-contract" element={<SignedContract />} />
+        <Route path="/contract-admin" element={<ContractAdmin />} />
       </Routes>
     </Router>
   )

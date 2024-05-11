@@ -7,6 +7,13 @@ class Product:
     id: str
     name: str
 
+@strawberry.type
+class Contract:
+    id: str
+    firstName: str
+    lastName: str
+    email: str
+
 def create_product(name: str) -> Product:
     id = str(uuid.uuid1())
     cb.insert(env.get_couchbase_conf(),
@@ -15,6 +22,15 @@ def create_product(name: str) -> Product:
                          key=id,
                          data={'name': name}))
     return Product(id=id, name=name)
+
+def create_contract(firstName: str, lastName: str, email:str) -> Contract:
+    id = str(uuid.uuid1())
+    cb.insert(env.get_couchbase_conf(),
+              cb.DocSpec(bucket=env.get_couchbase_bucket(),
+                         collection='contracts',
+                         key=id,
+                         data={'firstName': firstName, 'lastName': lastName, 'email': email}))
+    return Contract(id=id, firstName=firstName, lastName=lastName, email=email)
 #
 def get_product(id: str) -> Product | None:
     if doc := cb.get(env.get_couchbase_conf(),

@@ -54,6 +54,10 @@ class Mutation:
     async def remove_product(self, id: str) -> None:
         db.delete_product(id)
 
+    @strawberry.field(permission_classes=[IsAuthenticated])
+    async def add_contract(self, firstName: str, lastName: str, email:str) -> db.Contract:
+        return db.create_contract(firstName, lastName, email)    
+
 #### Queries ####
 
 @strawberry.type

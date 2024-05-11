@@ -216,8 +216,10 @@ modules:
       password: password
       script: |
         CREATE COLLECTION cillers._default.products IF NOT EXISTS;
+        CREATE COLLECTION cillers._default.contracts IF NOT EXISTS;
         CREATE PRIMARY INDEX IF NOT EXISTS ON cillers;
         CREATE PRIMARY INDEX IF NOT EXISTS ON cillers._default.products;
+        CREATE PRIMARY INDEX IF NOT EXISTS ON cillers._default.contracts;
       retries: 20
 
   - id: redpanda

@@ -34,7 +34,7 @@ const Contract: React.FC = () => {
             console.log('contractFirstname here:', contract.firstName)
             console.log(resp.data.addContract.id)
             // Navigate to a new route and pass the contract details as state
-            navigate('/contract-details', { state: { contract } });
+            navigate('/contract-details', { state: { contract, id: resp.data.addContract.id } });
         } catch (error) {
             console.error('Error submitting contract:', error);
         }

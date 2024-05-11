@@ -1,6 +1,8 @@
 import uuid
 import strawberry
 import hashlib
+import datetime
+from typing import Optional
 from . import couchbase as cb, env
 
 @strawberry.type
@@ -15,7 +17,8 @@ class Contract:
     lastName: str
     email: str
     signed: bool
-    checkSum: str
+    checkSum: Optional[str] = None
+    signageDate: Optional[str] = None
 
 def create_product(name: str) -> Product:
     id = str(uuid.uuid1())
@@ -33,14 +36,15 @@ def create_contract(firstName: str, lastName: str, email:str) -> Contract:
                          collection='contracts',
                          key=id,
                          data={'firstName': firstName, 'lastName': lastName, 'email': email, 'signed': False}))
-    return Contract(id=id, firstName=firstName, lastName=lastName, email=email, signed=False, checkSum='')
+    return Contract(id=id, firstName=firstName, lastName=lastName, email=email, signed=False, checkSum='', signageDate=None)
 
 def sign_contract(id: str) -> Contract | None:
     contract = cb.get(env.get_couchbase_conf(),
                      cb.DocRef(bucket=env.get_couchbase_bucket(),
                                collection='contracts',
                                key=id)).content_as[dict]
-    document = contract['firstName'] + contract['lastName'] + contract['email']
+    signageDate = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+    document = contract['firstName'] + contract['lastName'] + contract['email'] + signageDate
     checkSum = hashlib.md5(document.encode('utf-8')).hexdigest()
     print("Data: {}".format(contract)) 
     if contract :
@@ -48,8 +52,8 @@ def sign_contract(id: str) -> Contract | None:
                 cb.DocSpec(bucket=env.get_couchbase_bucket(),
                             collection='contracts',
                             key=id,
-                            data={'firstName': contract['firstName'], 'lastName': contract['lastName'], 'email': contract['email'], 'signed': True, 'checkSum': checkSum}))
-        return Contract(id=id, firstName=contract['firstName'], lastName=contract['lastName'], email=contract['email'], signed=True, checkSum=checkSum)
+                            data={'firstName': contract['firstName'], 'lastName': contract['lastName'], 'email': contract['email'], 'signed': True, 'checkSum': checkSum, 'signageDate':signageDate}))
+        return Contract(id=id, firstName=contract['firstName'], lastName=contract['lastName'], email=contract['email'], signed=True, checkSum=checkSum, signageDate=signageDate)
 #
 def get_product(id: str) -> Product | None:
     if doc := cb.get(env.get_couchbase_conf(),
@@ -70,3 +74,13 @@ def list_products() -> list[Product]:
         f"SELECT name, META().id FROM {env.get_couchbase_bucket()}._default.products"
     )
     return [Product(**r) for r in result]
+
+def list_contracts() -> list[Product]:
+    result = cb.exec(
+        env.get_couchbase_conf(),
+        f"SELECT *, META().id FROM {env.get_couchbase_bucket()}._default.contracts"
+    )
+    print('result')
+    print(result[0])
+    print(result[0]['contracts'])
+    return [Contract(id=r['id'], firstName=r['contracts']['firstName'], lastName=r['contracts']['lastName'], email=r['contracts']['email'], checkSum=r['contracts'].get('checkSum', None), signed=r['contracts']['signed'], signageDate=r['contracts'].get('signageDate', None)) for r in result]

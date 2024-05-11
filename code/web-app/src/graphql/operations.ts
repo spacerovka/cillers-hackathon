@@ -26,7 +26,13 @@ export const ADD_CONTRACT = gql`
 
 export const SIGN_CONTRACT = gql`
   mutation SignContract($id: String!) {
-    signContract(id: $id) { id, signed }
+    signContract(id: $id) { id, signed, checkSum, signageDate }
+  }
+`;
+
+export const GET_CONTRACTS = gql`
+  query GetContracts {
+    contracts { id, firstName, lastName, email, signed, checkSum, signageDate }
   }
 `;
 

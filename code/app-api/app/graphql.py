@@ -69,6 +69,10 @@ class Query:
     @strawberry.field
     def products(self) -> list[db.Product]:
         return db.list_products()
+    
+    @strawberry.field(permission_classes=[IsAuthenticated])
+    def contracts(self) -> list[db.Contract]:
+        return db.list_contracts() 
 
     @strawberry.field(permission_classes=[IsAuthenticated])
     def hello(self) -> Message:

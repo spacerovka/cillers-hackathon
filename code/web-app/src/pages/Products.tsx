@@ -89,6 +89,7 @@ const Products: React.FC = () => {
       <div className="navbar bg-base-300 text-neutral-content">
         <div className="flex-1">
           <a href="/" className="p-2 normal-case text-xl">Products</a>
+          <a href="/contract" className="p-2 normal-case text-xl">Contract</a>
         </div>
       </div>
 

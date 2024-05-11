@@ -18,6 +18,15 @@ export const ADD_PRODUCT = gql`
   }
 `;
 
+export const ADD_CONTRACT = gql`
+mutation AddContract($firstName: String!, $lastName: String!, $email: String!) {
+  addContract(firstName: $firstName, lastName: $lastName, email: $email) {
+    firstName
+    lastName
+    email
+    id
+`;
+
 export const REMOVE_PRODUCT = gql`
   mutation RemoveProduct($id: String!) {
     removeProduct(id: $id)

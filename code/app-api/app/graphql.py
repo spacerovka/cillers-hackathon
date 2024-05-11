@@ -56,7 +56,12 @@ class Mutation:
 
     @strawberry.field(permission_classes=[IsAuthenticated])
     async def add_contract(self, firstName: str, lastName: str, email:str) -> db.Contract:
-        return db.create_contract(firstName, lastName, email)    
+        return db.create_contract(firstName, lastName, email) 
+    
+    @strawberry.field(permission_classes=[IsAuthenticated])
+    async def sign_contract(self, id: str) -> db.Contract | None:
+        checksum = ''
+        return db.sign_contract(id, checksum)
 
 #### Queries ####
 

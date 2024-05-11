@@ -13,6 +13,8 @@ class Contract:
     firstName: str
     lastName: str
     email: str
+    signed: bool
+    checkSum: str
 
 def create_product(name: str) -> Product:
     id = str(uuid.uuid1())
@@ -29,8 +31,22 @@ def create_contract(firstName: str, lastName: str, email:str) -> Contract:
               cb.DocSpec(bucket=env.get_couchbase_bucket(),
                          collection='contracts',
                          key=id,
-                         data={'firstName': firstName, 'lastName': lastName, 'email': email}))
-    return Contract(id=id, firstName=firstName, lastName=lastName, email=email)
+                         data={'firstName': firstName, 'lastName': lastName, 'email': email, 'signed': False}))
+    return Contract(id=id, firstName=firstName, lastName=lastName, email=email, signed=False, checkSum='')
+
+def sign_contract(id: str, checkSum: str) -> Contract | None:
+    contract = cb.get(env.get_couchbase_conf(),
+                     cb.DocRef(bucket=env.get_couchbase_bucket(),
+                               collection='contracts',
+                               key=id))
+    print('Result is' + contract)
+    if contract :
+        cb.insert(env.get_couchbase_conf(),
+                cb.DocSpec(bucket=env.get_couchbase_bucket(),
+                            collection='contracts',
+                            key=id,
+                            data={'firstName': contract['firstName'], 'lastName': contract['lastName'], 'email': contract['email'], 'signed': True, 'checkSum': checkSum}))
+        return Contract(id=id, firstName=contract['firstName'], lastName=contract['lastName'], email=contract['email'], signed=True, checkSum='')
 #
 def get_product(id: str) -> Product | None:
     if doc := cb.get(env.get_couchbase_conf(),

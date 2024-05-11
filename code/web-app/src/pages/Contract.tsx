@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
 import { ADD_CONTRACT } from '../graphql/operations';
 
 interface Contract {
@@ -9,12 +10,13 @@ interface Contract {
 }
 
 const Contract: React.FC = () => {
+    const navigate = useNavigate();
     const [contract, setContract] = useState<Contract>({
         firstName: '',
         lastName: '',
         email: '',
     });
-    const [addContract] = useMutation(ADD_CONTRACT);
+    const [createContract] = useMutation(ADD_CONTRACT);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -28,26 +30,15 @@ const Contract: React.FC = () => {
         }
 
         try {
-            const response = await fetch('/input/add_contract', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(contract),
-            });
-
-            if (response.ok) {
-                console.log('Contract submitted successfully');
-                setContract({ firstName: '', lastName: '', email: '' }); // Clear contract after successful submission
-            } else {
-                const errorText = await response.text();
-                console.error('Failed to submit contract:', errorText);
-            }
+            const resp = await createContract({ variables: { firstName: contract.firstName, lastName: contract.lastName, email: contract.email } });
+            console.log('contractFirstname here:', contract.firstName)
+            console.log(resp.data.addContract.id)
+            // Navigate to a new route and pass the contract details as state
+            navigate('/contract-details', { state: { contract } });
         } catch (error) {
             console.error('Error submitting contract:', error);
         }
     };
-
 
     return (
         <div className="min-h-screen flex flex-col">

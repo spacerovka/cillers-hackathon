@@ -1,5 +1,6 @@
 import uuid
 import strawberry
+import hashlib
 from . import couchbase as cb, env
 
 @strawberry.type
@@ -34,19 +35,21 @@ def create_contract(firstName: str, lastName: str, email:str) -> Contract:
                          data={'firstName': firstName, 'lastName': lastName, 'email': email, 'signed': False}))
     return Contract(id=id, firstName=firstName, lastName=lastName, email=email, signed=False, checkSum='')
 
-def sign_contract(id: str, checkSum: str) -> Contract | None:
+def sign_contract(id: str) -> Contract | None:
     contract = cb.get(env.get_couchbase_conf(),
                      cb.DocRef(bucket=env.get_couchbase_bucket(),
                                collection='contracts',
-                               key=id))
-    print('Result is' + contract)
+                               key=id)).content_as[dict]
+    document = contract['firstName'] + contract['lastName'] + contract['email']
+    checkSum = hashlib.md5(document.encode('utf-8')).hexdigest()
+    print("Data: {}".format(contract)) 
     if contract :
-        cb.insert(env.get_couchbase_conf(),
+        cb.upsert(env.get_couchbase_conf(),
                 cb.DocSpec(bucket=env.get_couchbase_bucket(),
                             collection='contracts',
                             key=id,
                             data={'firstName': contract['firstName'], 'lastName': contract['lastName'], 'email': contract['email'], 'signed': True, 'checkSum': checkSum}))
-        return Contract(id=id, firstName=contract['firstName'], lastName=contract['lastName'], email=contract['email'], signed=True, checkSum='')
+        return Contract(id=id, firstName=contract['firstName'], lastName=contract['lastName'], email=contract['email'], signed=True, checkSum=checkSum)
 #
 def get_product(id: str) -> Product | None:
     if doc := cb.get(env.get_couchbase_conf(),
